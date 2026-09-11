@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# macOS
+.DS_Store
+~$*
+
+# Données brutes / Docker / scripts internes
+docker/
+code/raw/
+code/logs/
+code/output/*.json
+code/scraper*.py
+code/fix_*.py
+code/playwright*.py
+code/rescrape*.py
+code/calibrate*.py
+code/scoring_engine.py
+code/ecosystemes_mof.py
+import_to_db.py
+merge_rescrape.py
+run_all.sh
+generate_doc.py
+generate_rapport.py
+update_rapport_methodologie.py
+validate_benchmark.py
+rescrape_ecosysteme.py
+
+# Rapports et présentations (trop lourds / confidentiels)
+*.pptx
+*.xlsx
+*.pdf
+Rapport_*.docx
+Guide_*.docx
+Documentation_*.docx
+Planning_*.xlsx
+Presentation_*.docx
+
+# Tests
+pytest.ini
+tests/
