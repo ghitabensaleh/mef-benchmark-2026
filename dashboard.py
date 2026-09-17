@@ -870,11 +870,13 @@ elif page.startswith("🇲🇦"):
                    "Facebook","YouTube","Mention open data","Mention rapport annuel",
                    "Politique confidentialité","Déclaration accessibilité","Données téléchargeables"]
         hm_df = df[df["Pays"].isin(MENA_HM)].set_index("Pays")[[c for c in hm_cols if c in df.columns]].copy()
-        hm_num = hm_df.applymap(lambda x: 1 if x is True else (0 if x is False else None))
+        _applymap = getattr(hm_df, "map", None) or hm_df.applymap
+        hm_num = _applymap(lambda x: 1 if x is True else (0 if x is False else None))
         hm_num["_s"] = hm_num.sum(axis=1)
         hm_num = hm_num.sort_values("_s", ascending=False).drop("_s", axis=1)
         hm_num = hm_num.reindex(["Maroc"] + [p for p in hm_num.index if p != "Maroc"])
-        hm_txt = hm_num.applymap(lambda v: "✓" if v==1 else ("✗" if v==0 else "—"))
+        _applymap2 = getattr(hm_num, "map", None) or hm_num.applymap
+        hm_txt = _applymap2(lambda v: "✓" if v==1 else ("✗" if v==0 else "—"))
         fig_hm = px.imshow(hm_num, color_continuous_scale=[[0,"#FDECEA"],[0.5,"#F5EEF8"],[1,"#1A5276"]],
             aspect="auto", zmin=0, zmax=1)
         fig_hm.update_traces(text=hm_txt.values, texttemplate="%{text}", textfont=dict(size=12))
