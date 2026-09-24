@@ -584,7 +584,7 @@ if page.startswith("🌍"):
     st.markdown("""<div class="ok-box">
     ✅ <b>Lecture</b> : barres <b>bleues foncées à gauche</b> = indice eGov ONU (plus long = meilleur gouvernement numérique global).
     Barres <b>bleues claires à droite</b> = Score MEF (plus long = meilleur portail MoF).
-    La zone <b>rouge 🇲🇦</b> montre le Maroc : portail MoF <b>#35/128</b> bien au-dessus de son rang eGov global <b>#90/193</b>.
+    La zone <b>rouge 🇲🇦</b> montre le Maroc : portail MoF <b>#64/135</b> · rang eGov global <b>#90/193</b>.
     </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
@@ -752,19 +752,11 @@ elif page.startswith("🇲🇦"):
     re_mena,  ne_mena  = egov_rank_in(df_eg[df_eg["Pays"].isin(MENA_PAYS + ["Maroc"])])
 
     # ── Tableau comparatif des rangs ──────────────────────────────────────────
-    st.subheader("📍 Rangs du Maroc — deux lectures")
-    st.markdown("""<div class="warn-box">
-    ⚠️ <b>Pourquoi deux rangs différents ?</b>
-    L'<b>eGov ONU</b> (#90 mondial) mesure la maturité de tout le gouvernement numérique marocain.
-    Le <b>Score MEF</b> (#30 mondial) mesure uniquement les fonctionnalités du portail <b>finances.gov.ma</b>.
-    Le Maroc se classe mieux selon le Score MEF, ce qui indique que son portail MoF est
-    <b>plus avancé que la moyenne de son niveau de gouvernance numérique global</b>.
-    </div>""", unsafe_allow_html=True)
+    st.subheader("📍 Rangs du Maroc")
 
     comp_data = {
         "Périmètre": ["🌍 Mondial", "🌍 Afrique", "🌙 MENA"],
         "Score MEF 2026": [f"#{r_monde}/{n_monde}", f"#{r_afr}/{n_afr}", f"#{r_mena}/{n_mena}"],
-        "eGov ONU 2024":  [f"#{re_monde}/{ne_monde}", f"#{re_afr}/{ne_afr}", f"#{re_mena}/{ne_mena}"],
     }
     comp_df = pd.DataFrame(comp_data).set_index("Périmètre")
     st.dataframe(comp_df, use_container_width=True)
