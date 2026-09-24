@@ -474,38 +474,36 @@ if page.startswith("🌍"):
     # ── Comparaison directe des deux classements ──────────────────────────────
     st.subheader("📊 Comparaison — Rang MEF 2026 vs Rang eGov ONU 2024")
     st.markdown("""<div class="info-box" style="margin-bottom:14px;">
-    Les pays sont <b>classés par rang eGov ONU</b> (référence internationale). Le graphique de droite montre leur rang sur le <b>Score MEF</b> — les écarts illustrent où le portail MoF surperforme ou sous-performe.
-    🇲🇦 <b>Maroc : #90 eGov ONU → #35 MEF</b> : son portail MoF est bien plus avancé que sa gouvernance globale.
+    Comparaison sur les <b>132 pays présents dans les deux études</b> (MEF 2026 et eGov ONU 2024).
+    Les deux classements sont exprimés sur la même base, ce qui les rend directement comparables.
+    Les écarts illustrent où le portail MoF surperforme ou sous-performe par rapport à la gouvernance numérique globale du pays.
     </div>""", unsafe_allow_html=True)
 
-    # Tous les pays scorés + rang eGov — avec contrôle du nombre affiché
+    # Uniquement les 132 pays communs aux deux études
     df_comp = df[df["Score Maturité (%)"].notna() & df["Rang EGOV 2024"].notna()].copy()
-    df_comp_all = df[df["Rang EGOV 2024"].notna()].copy()  # inclut non-scorés
     df_comp = df_comp.sort_values("Score Maturité (%)", ascending=False).reset_index(drop=True)
     df_comp["Rang MEF"] = range(1, len(df_comp)+1)
 
-    # Fusionner pays non-scorés (wayback/failed) avec rang MEF = "—"
-    df_comp_all = df_comp_all.merge(
-        df_comp[["Pays","Rang MEF"]], on="Pays", how="left"
-    )
-    df_comp_all["Rang MEF"] = df_comp_all["Rang MEF"].fillna(0).astype(int)
-    df_comp_all = df_comp_all.sort_values("Rang EGOV 2024")
+    # Rang eGov recalculé sur les 132 pays communs
+    df_comp = df_comp.sort_values("Rang EGOV 2024").reset_index(drop=True)
+    df_comp["Rang EGOV commun"] = range(1, len(df_comp)+1)
 
-    n_mef_total = len(df_comp)
-    n_total_egov = len(df_comp_all)
+    n_commun = len(df_comp)
 
     _col_ctrl, _ = st.columns([1, 3])
     with _col_ctrl:
-        n_show = st.slider("Nombre de pays affichés", min_value=20, max_value=n_total_egov,
-                           value=min(50, n_total_egov), step=10,
+        n_show = st.slider("Nombre de pays affichés", min_value=20, max_value=n_commun,
+                           value=min(50, n_commun), step=10,
                            help="Défilez pour voir plus de pays, triés par rang eGov ONU")
-    top25 = df_comp_all.head(n_show).copy()
+    top25 = df_comp.head(n_show).copy()
     top25 = top25.sort_values("Rang EGOV 2024", ascending=False)  # inversé pour bar horiz
 
-    pays_list  = top25["Pays"].tolist()
-    rang_mef   = top25["Rang MEF"].tolist()
-    rang_egov  = top25["Rang EGOV 2024"].tolist()
-    scores_mef = top25["Score Maturité (%)"].fillna(0).tolist()
+    pays_list       = top25["Pays"].tolist()
+    rang_mef        = top25["Rang MEF"].tolist()
+    rang_egov       = top25["Rang EGOV 2024"].tolist()
+    rang_egov_comm  = top25["Rang EGOV commun"].tolist()
+    scores_mef      = top25["Score Maturité (%)"].fillna(0).tolist()
+    n_mef_total     = n_commun
 
     def _color(p, base, highlight="#E8431A"):
         return [highlight if x == "Maroc" else base for x in p]
@@ -522,12 +520,12 @@ if page.startswith("🌍"):
         x=[-v for v in top25["Indice EGOV"].fillna(0).tolist()],
         orientation="h",
         marker=dict(color=_color(pays_list, "#1A5276"), line=dict(color="white", width=0.4)),
-        text=[f"#{int(r)}/193" for r in rang_egov],
+        text=[f"#{int(r)}/{n_commun}" for r in rang_egov_comm],
         textposition="inside",
         insidetextanchor="start",
         textfont=dict(size=10, color="white"),
-        hovertemplate="<b>%{y}</b><br>Rang eGov : #%{customdata}/193<extra></extra>",
-        customdata=[int(r) for r in rang_egov],
+        hovertemplate="<b>%{y}</b><br>Rang eGov (sur 132 communs) : #%{customdata}<extra></extra>",
+        customdata=[int(r) for r in rang_egov_comm],
     ))
 
     # Barres MEF (vers la droite)
@@ -581,10 +579,10 @@ if page.startswith("🌍"):
 
     st.plotly_chart(fig_butterfly, use_container_width=True)
 
-    st.markdown("""<div class="ok-box">
-    ✅ <b>Lecture</b> : barres <b>bleues foncées à gauche</b> = indice eGov ONU (plus long = meilleur gouvernement numérique global).
-    Barres <b>bleues claires à droite</b> = Score MEF (plus long = meilleur portail MoF).
-    La zone <b>rouge 🇲🇦</b> montre le Maroc : portail MoF <b>#64/135</b> · rang eGov global <b>#90/193</b>.
+    st.markdown(f"""<div class="ok-box">
+    ✅ <b>Lecture</b> : barres <b>bleues foncées à gauche</b> = rang eGov ONU recalculé sur les {n_commun} pays communs (plus long = meilleur).
+    Barres <b>bleues claires à droite</b> = rang MEF 2026 sur les mêmes {n_commun} pays (plus long = meilleur).
+    Les deux classements sont comparables car ils portent sur le même périmètre.
     </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
